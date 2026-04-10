@@ -1,10 +1,13 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
@@ -13,13 +16,27 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
+    // Bật chế độ kiểm tra kiểu dữ liệu nghiêm ngặt toàn bộ project
+    // -> giúp phát hiện sớm lỗi null/undefined, type sai, thiếu check dữ liệu
+    "strict": true,
+    // Phân biệt rõ field optional (?) với field có giá trị undefined
+    // -> field?: string nghĩa là "có thể không tồn tại"
+    // -> KHÔNG đồng nghĩa với field: undefined (luôn tồn tại nhưng có thể là undefined)
+    // -> rất quan trọng cho payload update / DTO / API contract
+    "exactOptionalPropertyTypes": true,
+    // Khi truy cập array[index] hoặc object[key], TS sẽ coi kết quả có thể là undefined
+    // -> ép phải check tồn tại trước khi dùng
+    // -> tránh lỗi runtime kiểu Cannot read properties of undefined
+    "noUncheckedIndexedAccess": true,
     "plugins": [
       {
         "name": "next"
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": [
+        "./*"
+      ]
     }
   },
   "include": [
@@ -30,5 +47,7 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

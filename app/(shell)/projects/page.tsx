@@ -1,38 +1,97 @@
+'use client';
+
+import React, { useState } from 'react';
+import { useProjects } from '@/features/projects/hooks/useProjects';
+import { CreateProjectModal } from '@/features/projects/components/CreateProjectModal';
+import { UpdateProjectModal } from '@/features/projects/components/UpdateProjectModal';
+import { DeleteProjectModal } from '@/features/projects/components/DeleteProjectModal';
+import { ProjectCard } from '@/features/projects/components/ProjectCard';
+import { Project } from '@/features/projects/types';
+import { Plus, LayoutGrid, ArrowRight, Loader2, Sparkles } from 'lucide-react';
+
 export default function ProjectsPage() {
+    const { projects, isLoading, refresh } = useProjects();
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [editingProject, setEditingProject] = useState<Project | null>(null);
+    const [deletingProject, setDeletingProject] = useState<Project | null>(null);
+
     return (
-        <div className="space-y-6">
-            <div className="flex justify-between items-center bg-background border border-border p-4 rounded-xl shadow-sm">
-                <h2 className="text-xl font-semibold">Active Projects</h2>
-                <button className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">
-                    Create Project
+        <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+            {/* Header Section */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gradient-to-br from-white to-zinc-50/50 dark:from-zinc-900 dark:to-zinc-950 p-8 rounded-2xl border border-border shadow-sm">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight text-foreground">Project Management</h1>
+                    <p className="text-muted-foreground mt-2 max-w-lg">
+                        Manage your AI projects, monitor token usage, and configure model providers from a single dashboard.
+                    </p>
+                </div>
+                <button
+                    onClick={() => setIsCreateModalOpen(true)}
+                    className="group bg-primary text-primary-foreground flex items-center gap-2 px-6 py-3 rounded-xl font-bold hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-95 shadow-lg shadow-primary/20"
+                >
+                    <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
+                    New Project
                 </button>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="bg-background border border-border p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="font-semibold text-lg hover:underline transition-all">Project Name {i}</h3>
-                            <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-                                In Progress
-                            </span>
-                        </div>
-                        <p className="text-sm text-muted-foreground mb-4">
-                            A short description of project {i} explaining what it does and why it is important.
-                        </p>
-                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                            <div className="flex -space-x-2">
-                                <div className="w-6 h-6 rounded-full border-2 border-background bg-zinc-200 dark:bg-zinc-700"></div>
-                                <div className="w-6 h-6 rounded-full border-2 border-background bg-zinc-300 dark:bg-zinc-600"></div>
-                                <div className="w-6 h-6 rounded-full border-2 border-background bg-zinc-400 dark:bg-zinc-500 flex items-center justify-center text-[10px] text-white">
-                                    +3
-                                </div>
-                            </div>
-                            <span>Updated 3 days ago</span>
-                        </div>
+            {/* Content Section */}
+            {isLoading ? (
+                <div className="flex flex-col items-center justify-center py-24 gap-4">
+                    <Loader2 className="w-12 h-12 text-primary animate-spin" />
+                    <p className="text-muted-foreground font-medium">Loading your projects...</p>
+                </div>
+            ) : projects.length === 0 ? (
+                <div className="text-center py-24 bg-card border border-dashed border-border rounded-2xl">
+                    <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <Sparkles className="w-8 h-8 text-primary" />
                     </div>
-                ))}
-            </div>
+                    <h3 className="text-xl font-bold text-foreground">No projects yet</h3>
+                    <p className="text-muted-foreground mt-2 max-w-sm mx-auto">
+                        Get started by creating your first project to begin optimizing your AI costs.
+                    </p>
+                    <button
+                        onClick={() => setIsCreateModalOpen(true)}
+                        className="mt-6 text-primary font-semibold hover:underline flex items-center gap-2 mx-auto"
+                    >
+                        Create your first project <ArrowRight className="w-4 h-4" />
+                    </button>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {projects.map((project) => (
+                        <ProjectCard
+                            key={project.id}
+                            project={project}
+                            onEdit={setEditingProject}
+                            onDelete={setDeletingProject}
+                        />
+                    ))}
+                </div>
+            )}
+
+            <CreateProjectModal
+                isOpen={isCreateModalOpen}
+                onClose={() => setIsCreateModalOpen(false)}
+                onSuccess={refresh}
+            />
+
+            {editingProject && (
+                <UpdateProjectModal
+                    project={editingProject}
+                    isOpen={!!editingProject}
+                    onClose={() => setEditingProject(null)}
+                    onSuccess={refresh}
+                />
+            )}
+
+            {deletingProject && (
+                <DeleteProjectModal
+                    project={deletingProject}
+                    isOpen={!!deletingProject}
+                    onClose={() => setDeletingProject(null)}
+                    onSuccess={refresh}
+                />
+            )}
         </div>
     );
 }
