@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
 
@@ -12,11 +13,27 @@ export default function ShellLayout({
             <Sidebar />
 
             {/* Main Content Area */}
-            <div className="flex-1 ml-64 flex flex-col min-h-screen transition-all duration-300">
+            <div
+                className={clsx(
+                    "flex-1",
+                    "ml-64",
+                    "flex flex-col",
+                    "min-h-screen",
+                    "transition-all duration-300"
+                )}
+            >
                 <Header />
 
                 {/* Page Content */}
-                <main className="flex-1 p-8 overflow-y-auto w-full max-w-7xl mx-auto">
+                <main
+                    className={clsx(
+                        "flex-1",
+                        "p-8",
+                        "overflow-y-auto",
+                        "w-full max-w-7xl",
+                        "mx-auto"
+                    )}
+                >
                     {children}
                 </main>
             </div>
